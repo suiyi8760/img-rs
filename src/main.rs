@@ -40,6 +40,7 @@ async fn main() {
     // run server
     let addr = "127.0.0.1:6000".parse().unwrap();
     tracing::debug!("listening on {}", addr);
+    println!("🚀 Server listening on {}", addr);
     axum::Server::bind(&addr)
         .serve(app.into_make_service())
         .await
