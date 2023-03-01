@@ -1,4 +1,9 @@
-use axum::{extract::Path, handler::get, http::StatusCode, Router};
+use axum::{
+    extract::Path,
+    http::StatusCode,
+    routing::get,
+    Router,
+};
 use percent_encoding::percent_decode_str;
 use serde::Deserialize;
 use std::convert::TryInto;
@@ -24,6 +29,19 @@ async fn generate(Path(Params { spec, url }): Path<Params>) -> Result<String, St
     Ok(format!("url: {}\n spec: {:#?}", url, spec))
 }
 
-fn main() {
-    println!("Hello, world!");
+#[tokio::main]
+async fn main() {
+    //init tracing
+    tracing_subscriber::fmt::init();
+
+    // 构建路由
+    let app = Router::new().route("/image/:spec/:url", get(generate));
+
+    // run server
+    let addr = "127.0.0.1:6000".parse().unwrap();
+    tracing::debug!("listening on {}", addr);
+    axum::Server::bind(&addr)
+        .serve(app.into_make_service())
+        .await
+        .unwrap();
 }
